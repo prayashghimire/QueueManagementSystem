@@ -1,0 +1,6 @@
+@QueueMs_HostAddress = http://localhost:5183
+
+GET {{QueueMs_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
