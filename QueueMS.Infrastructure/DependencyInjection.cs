@@ -19,7 +19,7 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
                 .EnableSensitiveDataLogging());
 
-        services.AddIdentity<User, IdentityRole>()
+        services.AddIdentity<User, IdentityRole<int>>()
             .AddEntityFrameworkStores<QueueMSDatabaseContext>()
             .AddDefaultTokenProviders();
 

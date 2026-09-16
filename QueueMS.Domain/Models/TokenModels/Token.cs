@@ -7,6 +7,7 @@ namespace QueueMS.Domain.Models.TokenModels;
 
 public class Token
 {
+    public int Id { get; set; }
     public string TokenNumber { get; set; } = string.Empty;
     public int UserId { get; set; }
     public int ServiceId { get; set; }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using QueueMS.Domain.Models.CounterModels;
 using QueueMS.Domain.Models.ServiceModel;
@@ -8,7 +9,7 @@ using System.Data.Common;
 
 namespace QueueMS.Infrastructure.DatabaseContext;
 
-public class QueueMSDatabaseContext : IdentityDbContext<User>
+public class QueueMSDatabaseContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
     private DbTransaction? _transaction;
 

@@ -6,7 +6,7 @@ using QueueMS.Domain.Models.TokenModels;
 
 namespace QueueMS.Domain.Models.UserModels;
 
-public class User : IdentityUser
+public class User : IdentityUser<int>
 {
     public UserRole Role { get; set; }
     public bool IsActive { get; set; }
