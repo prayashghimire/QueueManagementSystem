@@ -1,4 +1,4 @@
-﻿namespace QueueMS.Appilication.DTOs;
+﻿namespace QueueMS.Appilication.DTOs.Auth;
 
 public class LoginRequest
 {

@@ -1,20 +1,22 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using QueueMS.Appilication.DTOs;
+using QueueMS.Appilication.DTOs.Auth;
 using QueueMS.Appilication.Interfaces;
 using QueueMS.Domain.Models.UserModels;
 
-namespace QueueMS.Appilication.Services;
+namespace QueueMS.Appilication.Service;
 
 public class AuthService : IAuthService
 {
 
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
+    private readonly IJwtTokenService _tokenService;
 
-    public AuthService(UserManager<User> userManager,  SignInManager<User> signInManager)
+    public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IJwtTokenService tokenService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _tokenService = tokenService;
     }
 
 
@@ -40,11 +42,31 @@ public class AuthService : IAuthService
         
     }
 
-    public async Task<SignInResult> LoginAsync(LoginRequest loginDto)
+    public async Task<LoginResponse> LoginAsync(LoginRequest loginDto)
     {
-        var userLogin = await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, isPersistent: false, lockoutOnFailure: false);
+        var user = await _userManager.FindByEmailAsync(loginDto.Email);
+        if (user is null) throw new UnauthorizedAccessException("Invalid Email");
 
-        return userLogin;
+        var userLogin = await _signInManager.CheckPasswordSignInAsync(user,loginDto.Password, lockoutOnFailure: false);
+
+        if (!userLogin.Succeeded)
+        {
+            throw new UnauthorizedAccessException("Invalid email or password");
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var (token, expiresAt) = _tokenService.CreateToken(user, roles);
+
+
+
+        return new LoginResponse
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            Roles = roles,
+            Token = token,
+            ExpiresAt = expiresAt
+        };
     }
 
     public async Task LogoutAsync()

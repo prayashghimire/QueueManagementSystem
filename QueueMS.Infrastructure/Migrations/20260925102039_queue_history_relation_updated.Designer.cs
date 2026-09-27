@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QueueMS.Infrastructure.DatabaseContext;
@@ -11,9 +12,11 @@ using QueueMS.Infrastructure.DatabaseContext;
 namespace QueueMS.Infrastructure.Migrations
 {
     [DbContext(typeof(QueueMSDatabaseContext))]
-    partial class QueueMSDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260925102039_queue_history_relation_updated")]
+    partial class queue_history_relation_updated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,15 +346,11 @@ namespace QueueMS.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CalledAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("called_at");
-
-                    b.Property<DateTime?>("CompletedAt")
+                    b.Property<DateTime>("CompletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("completed_at");
 
-                    b.Property<int?>("CounterId")
+                    b.Property<int>("CounterId")
                         .HasColumnType("integer")
                         .HasColumnName("counter_id");
 
@@ -363,7 +362,7 @@ namespace QueueMS.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("service_id");
 
-                    b.Property<DateTime?>("StartedAt")
+                    b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("started_at");
 
@@ -629,6 +628,7 @@ namespace QueueMS.Infrastructure.Migrations
                         .WithMany("Tokens")
                         .HasForeignKey("CounterId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
                         .HasConstraintName("fk_tokens_counters_counter_id");
 
                     b.HasOne("QueueMS.Domain.Models.ServiceModel.Services", "Service")

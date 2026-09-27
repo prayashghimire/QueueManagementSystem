@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using QueueMS.Appilication.DTOs;
 using QueueMS.Appilication.Interfaces;
 using QueueMs.Responses;
+using Microsoft.AspNetCore.Authorization;
+using QueueMS.Appilication.DTOs.Auth;
 
 namespace QueueMs.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -19,6 +21,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<IActionResult>Register(RegisterRequest req)
     {
         var result = await _authService.RegisterAsync(req);
@@ -26,19 +29,22 @@ public class AuthController : ControllerBase
         {
             return ApiResponses.BadRequest("User Registration Failed");
         }
-        return ApiResponses.Ok("User Registered Successfully", result);
+        return ApiResponses.Ok("Registered successfully", result);
     }
 
 
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginRequest req)
     {
-        var result = await _authService.LoginAsync(req);
-        if (!result.Succeeded)
+        try
         {
-            return ApiResponses.BadRequest("User Login Failed");
+            var result = await _authService.LoginAsync(req);
+            return ApiResponses.Ok("User Login Successful", result);
+        }catch(UnauthorizedAccessException)
+        {
+            return Unauthorized();
         }
-        return ApiResponses.Ok("User Login Successful", result);
     }
 
     [HttpPost("logout")]

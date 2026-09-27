@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QueueMS.Infrastructure.DatabaseContext;
@@ -11,9 +12,11 @@ using QueueMS.Infrastructure.DatabaseContext;
 namespace QueueMS.Infrastructure.Migrations
 {
     [DbContext(typeof(QueueMSDatabaseContext))]
-    partial class QueueMSDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260925100835_queue_history_table_added")]
+    partial class queue_history_table_added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,15 +288,6 @@ namespace QueueMS.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_queue_history");
 
-                    b.HasIndex("CounterId")
-                        .HasDatabaseName("ix_queue_history_counter_id");
-
-                    b.HasIndex("PerformedBy")
-                        .HasDatabaseName("ix_queue_history_performed_by");
-
-                    b.HasIndex("TokenId")
-                        .HasDatabaseName("ix_queue_history_token_id");
-
                     b.ToTable("queue_history", (string)null);
                 });
 
@@ -343,15 +337,11 @@ namespace QueueMS.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CalledAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("called_at");
-
-                    b.Property<DateTime?>("CompletedAt")
+                    b.Property<DateTime>("CompletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("completed_at");
 
-                    b.Property<int?>("CounterId")
+                    b.Property<int>("CounterId")
                         .HasColumnType("integer")
                         .HasColumnName("counter_id");
 
@@ -363,7 +353,7 @@ namespace QueueMS.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("service_id");
 
-                    b.Property<DateTime?>("StartedAt")
+                    b.Property<DateTime>("StartedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("started_at");
 
@@ -593,42 +583,13 @@ namespace QueueMS.Infrastructure.Migrations
                     b.Navigation("Staff");
                 });
 
-            modelBuilder.Entity("QueueMS.Domain.Models.QueueModels.QueueHistory", b =>
-                {
-                    b.HasOne("QueueMS.Domain.Models.CounterModels.Counter", "Counter")
-                        .WithMany("QueueHistories")
-                        .HasForeignKey("CounterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_queue_history_counters_counter_id");
-
-                    b.HasOne("QueueMS.Domain.Models.UserModels.User", "User")
-                        .WithMany("QueueHistories")
-                        .HasForeignKey("PerformedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_queue_history_asp_net_users_performed_by");
-
-                    b.HasOne("QueueMS.Domain.Models.TokenModels.Token", "Token")
-                        .WithMany("QueueHistories")
-                        .HasForeignKey("TokenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_queue_history_tokens_token_id");
-
-                    b.Navigation("Counter");
-
-                    b.Navigation("Token");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("QueueMS.Domain.Models.TokenModels.Token", b =>
                 {
                     b.HasOne("QueueMS.Domain.Models.CounterModels.Counter", "Counter")
                         .WithMany("Tokens")
                         .HasForeignKey("CounterId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
                         .HasConstraintName("fk_tokens_counters_counter_id");
 
                     b.HasOne("QueueMS.Domain.Models.ServiceModel.Services", "Service")
@@ -658,8 +619,6 @@ namespace QueueMS.Infrastructure.Migrations
 
                     b.Navigation("CounterStaffs");
 
-                    b.Navigation("QueueHistories");
-
                     b.Navigation("Tokens");
                 });
 
@@ -670,16 +629,9 @@ namespace QueueMS.Infrastructure.Migrations
                     b.Navigation("Tokens");
                 });
 
-            modelBuilder.Entity("QueueMS.Domain.Models.TokenModels.Token", b =>
-                {
-                    b.Navigation("QueueHistories");
-                });
-
             modelBuilder.Entity("QueueMS.Domain.Models.UserModels.User", b =>
                 {
                     b.Navigation("CounterStaffs");
-
-                    b.Navigation("QueueHistories");
 
                     b.Navigation("Tokens");
                 });

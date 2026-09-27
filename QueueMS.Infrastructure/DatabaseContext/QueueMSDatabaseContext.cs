@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using QueueMS.Domain.Models.CounterModels;
+using QueueMS.Domain.Models.QueueModels;
 using QueueMS.Domain.Models.ServiceModel;
 using QueueMS.Domain.Models.TokenModels;
 using QueueMS.Domain.Models.UserModels;
@@ -21,6 +22,7 @@ public class QueueMSDatabaseContext : IdentityDbContext<User, IdentityRole<int>,
     public DbSet<Token> Tokens { get; set; }
     public DbSet<User> Users {  get; set; }
     public DbSet<CounterService> CounterServices {  get; set; }
+    public DbSet<QueueHistory> QueueHistory { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -97,6 +99,28 @@ public class QueueMSDatabaseContext : IdentityDbContext<User, IdentityRole<int>,
             .HasOne(x => x.Counter)
             .WithMany(x => x.Tokens)
             .HasForeignKey(x =>x.CounterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Token -> QueueHistory
+        modelBuilder.Entity<QueueHistory>()
+            .HasOne(x => x.Token)
+            .WithMany(x => x.QueueHistories)
+            .HasForeignKey(x => x.TokenId);
+
+
+        // Counter -> QueueHistory
+        modelBuilder.Entity<QueueHistory>()
+            .HasOne(x => x.Counter)
+            .WithMany(x => x.QueueHistories)
+            .HasForeignKey(x => x.CounterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+        // User -> QueueHistory
+        modelBuilder.Entity<QueueHistory>()
+            .HasOne(x => x.User)
+            .WithMany(x => x.QueueHistories)
+            .HasForeignKey(x => x.PerformedBy)
             .OnDelete(DeleteBehavior.Restrict);
 
 

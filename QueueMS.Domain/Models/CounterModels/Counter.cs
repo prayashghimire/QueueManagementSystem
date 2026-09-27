@@ -1,4 +1,5 @@
 ﻿
+using QueueMS.Domain.Models.QueueModels;
 using QueueMS.Domain.Models.TokenModels;
 
 namespace QueueMS.Domain.Models.CounterModels;
@@ -14,5 +15,6 @@ public class Counter
     public ICollection<CounterService> CounterServices { get; set; } = 
         new List<CounterService>();
     public ICollection<CounterStaff> CounterStaffs { get; set; } = new List<CounterStaff>();
+    public ICollection<QueueHistory> QueueHistories { get; set; } = new List<QueueHistory>();
 
 }
