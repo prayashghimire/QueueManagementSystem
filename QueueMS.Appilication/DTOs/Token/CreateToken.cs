@@ -2,4 +2,5 @@
 
 public class CreateToken
 {
+    public int ServiceId { get; set; }
 }

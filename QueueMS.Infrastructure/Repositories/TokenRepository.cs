@@ -33,6 +33,34 @@ public class TokenRepository : ITokenRepository
         return await _context.Tokens
             .Where(x => x.UserId == userId).ToListAsync();
     }
+
+    public async Task<int> GetNextTokenNumberAsync(int serviceId, DateOnly tokenDate)
+    {
+
+        var counter = await _context.TokenCounter
+                        .FirstOrDefaultAsync(x => x.ServiceId == serviceId && x.TokenDate == tokenDate);
+
+        if (counter == null)
+        {
+            counter = new TokenCounter
+            {
+                ServiceId = serviceId,
+                TokenDate = tokenDate,
+                LastNumber = 1
+
+            };
+
+            _context.TokenCounter.Add(counter);
+        }
+        else
+            counter.LastNumber += 1;
+
+        await _context.SaveChangesAsync();
+
+        return counter.LastNumber;
+                           
+    }
+    
     public async Task AddAsync(Token token)
     {
         await _context.Tokens.AddAsync(token);
@@ -54,4 +82,6 @@ public class TokenRepository : ITokenRepository
         token.Status = TokenStatus.CANCELLED;
         await _context.SaveChangesAsync();
     }
+
+  
 }

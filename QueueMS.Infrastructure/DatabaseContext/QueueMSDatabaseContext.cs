@@ -12,7 +12,7 @@ namespace QueueMS.Infrastructure.DatabaseContext;
 
 public class QueueMSDatabaseContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
-    private DbTransaction? _transaction;
+    //private DbTransaction? _transaction;
 
     public QueueMSDatabaseContext(DbContextOptions<QueueMSDatabaseContext> options) : base(options) { }
 
@@ -20,9 +20,10 @@ public class QueueMSDatabaseContext : IdentityDbContext<User, IdentityRole<int>,
     public DbSet<CounterStaff> CounterStaffs { get; set; }
     public DbSet<Services> Services { get; set; }
     public DbSet<Token> Tokens { get; set; }
-    public DbSet<User> Users {  get; set; }
+    public override DbSet<User> Users {  get; set; }
     public DbSet<CounterService> CounterServices {  get; set; }
     public DbSet<QueueHistory> QueueHistory { get; set; }
+    public DbSet<TokenCounter> TokenCounter { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -123,6 +124,25 @@ public class QueueMSDatabaseContext : IdentityDbContext<User, IdentityRole<int>,
             .HasForeignKey(x => x.PerformedBy)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Services -> TokenCounters
+        modelBuilder.Entity<TokenCounter>(entity => {
+            entity.HasKey(x => x.Id);
+
+            entity.HasOne(x => x.Services)
+            .WithMany(x => x.TokenCounters)
+            .HasForeignKey(x => x.ServiceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
+            entity.HasIndex(x => new
+            {
+                x.ServiceId,
+                x.TokenDate
+            }).IsUnique();
+
+
+        });
+
 
         // Unique Fields 
 
@@ -131,9 +151,15 @@ public class QueueMSDatabaseContext : IdentityDbContext<User, IdentityRole<int>,
             .IsUnique();
 
 
-        modelBuilder.Entity<Services>()
-            .HasIndex(x => x.Prefix)
-            .IsUnique();
+        modelBuilder.Entity<Services>(entity =>
+        {
+            entity.HasKey(x =>x.Id);
+
+            entity.Property(x => x.Name)
+            .IsRequired()
+            .HasMaxLength(100);
+        });
+            
 
         modelBuilder.Entity<Token>()
             .HasIndex(x => x.TokenNumber)

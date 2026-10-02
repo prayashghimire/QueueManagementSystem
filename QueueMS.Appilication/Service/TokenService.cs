@@ -1,4 +1,5 @@
 ﻿using QueueMS.Appilication.DTOs.Token;
+using QueueMS.Appilication.Helper;
 using QueueMS.Appilication.Interfaces;
 using QueueMS.Domain.Enum;
 using QueueMS.Domain.Models.TokenModels;
@@ -36,9 +37,9 @@ public class TokenService : ITokenService
         await _tokenRepository.UpdateAsync(token);
     }
 
-    public async Task<List<TokenResponse>> GetCustomerTokenAsync(int customerId)
+    public async Task<List<TokenResponse>> GetCustomerTokenAsync(int userId)
     {
-        var token = await _tokenRepository.GetByCustomerIdAsync(customerId);
+        var token = await _tokenRepository.GetByCustomerIdAsync(userId);
 
         return token.Select(t => new TokenResponse
         {
@@ -76,11 +77,19 @@ public class TokenService : ITokenService
             throw new Exception("Service not Found");
         }
 
+        var tokenDate = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var nextNumber = await _tokenRepository.GetNextTokenNumberAsync(serviceId, tokenDate);
+
+        var tokenPrefix = TokenPrefixGenerator.Generate(service.Name);
+        var tokenNumber = $"{tokenPrefix}-{nextNumber:D3}";
+
         var token = new Token
         {
             ServiceId = serviceId,
             UserId = userId,
             Status = TokenStatus.WAITING,
+            TokenNumber = tokenNumber,
             CreatedAt = DateTime.UtcNow,
 
         };

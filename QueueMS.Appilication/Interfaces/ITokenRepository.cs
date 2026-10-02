@@ -4,10 +4,11 @@ namespace QueueMS.Appilication.Interfaces;
 
 public interface ITokenRepository
 {
-    public Task<Token?>GetByIdAsync(int id);
-    public Task<List<Token>> GetByCustomerIdAsync(int userId);
-    public Task<List<Token>> GetWaitingTokenAsync(int serviceId);
-    public Task AddAsync(Token token);
-    public Task UpdateAsync (Token token);
-    public Task CancelAsync(int tokenId);
+     Task<Token?>GetByIdAsync(int id);
+     Task<List<Token>> GetByCustomerIdAsync(int userId);
+     Task<List<Token>> GetWaitingTokenAsync(int serviceId);
+     Task<int> GetNextTokenNumberAsync(int serviceId, DateOnly tokenDate);
+     Task AddAsync(Token token);
+     Task UpdateAsync (Token token);
+     Task CancelAsync(int tokenId);
 }

@@ -10,19 +10,30 @@ using QueueMS.Appilication.Service;
 using QueueMS.Domain.Models.ServiceModel;
 using QueueMS.Domain.Models.UserModels;
 using QueueMS.Infrastructure.DatabaseContext;
+using QueueMS.Infrastructure.Repositories;
 using System.Text;
 
 namespace QueueMS.Infrastructure;
 
-public static class DependencyInjection
+public static class ServiceDependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICounterRepository, CounterRepository>();
+        services.AddScoped<IQueueRepository, QueueRepository>();
+        services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddScoped<ITokenRepository, TokenRepository>();
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IServiceManager, ServiceManager>();
+        services.AddScoped<IRolesManager,  RolesManager>();
+        services.AddScoped<ICounterStaffRepository, CounterStaffRepository>();
 
         services.AddDbContext<QueueMSDatabaseContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
                 .EnableSensitiveDataLogging());
+
+       
 
         services.AddCors(options =>
         {
@@ -44,7 +55,11 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication(options => {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QueueMS.Infrastructure.DatabaseContext;
@@ -11,9 +12,11 @@ using QueueMS.Infrastructure.DatabaseContext;
 namespace QueueMS.Infrastructure.Migrations
 {
     [DbContext(typeof(QueueMSDatabaseContext))]
-    partial class QueueMSDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20261002150220_removed prefix column from services")]
+    partial class removedprefixcolumnfromservices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
